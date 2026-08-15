@@ -6,6 +6,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { createExperience, getExperienceById, getExperienceBySlug, getGlobalGenerationCount, getUsage, incrementUsage, updateExperience } from "./birthdayDb";
 import { generateBlueprint } from "./birthdayAi";
+import { storagePut } from "./storage";
+import { createExperiencePhoto } from "./photoDb";
 
 const inputSchema = z.object({
   name: z.string().min(1).max(80),
@@ -49,6 +51,15 @@ export const appRouter = router({
       await incrementUsage(ctx.user.id, "regeneration");
       await updateExperience(existing.id, result.blueprint);
       return { ...result, slug: existing.slug, experienceId: existing.id };
+    }),
+    addPhoto: protectedProcedure.input(z.object({ experienceId: z.number().int().positive(), fileName: z.string().regex(/^[a-zA-Z0-9._-]+$/).max(120), contentType: z.enum(["image/jpeg", "image/png", "image/webp"]), base64: z.string().max(4_000_000) })).mutation(async ({ ctx, input }) => {
+      const existing = await getExperienceById(input.experienceId);
+      if (!existing || existing.ownerId !== ctx.user.id) throw new Error("Experience not found.");
+      const data = Buffer.from(input.base64.replace(/^data:[^;]+;base64,/, ""), "base64");
+      if (data.byteLength > 3_000_000) throw new Error("Photo must be smaller than 3 MB.");
+      const uploaded = await storagePut(`birthday/${ctx.user.id}/${input.fileName}`, data, input.contentType);
+      const photoId = await createExperiencePhoto({ experienceId: input.experienceId, ownerId: ctx.user.id, storageKey: uploaded.key, url: uploaded.url });
+      return { photoId, url: uploaded.url };
     }),
     read: publicProcedure.input(z.object({ slug: z.string().min(3).max(80) })).query(({ input }) => getExperienceBySlug(input.slug)),
   }),

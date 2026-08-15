@@ -17,3 +17,25 @@ describe("birthday blueprint contract", () => {
     expect(JSON.stringify(blueprint)).not.toContain("Karachi");
   });
 });
+
+import { appRouter } from "./routers";
+import type { TrpcContext } from "./_core/context";
+
+describe("birthday API boundaries", () => {
+  it("rejects generation without an authenticated user", async () => {
+    const ctx: TrpcContext = {
+      user: null,
+      req: { protocol: "https", headers: {} } as TrpcContext["req"],
+      res: {} as TrpcContext["res"],
+    };
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.birthday.generate({
+      name: "Ahmed",
+      nickname: "Shani",
+      relationship: "Best friend",
+      about: "cricket",
+      message: "Happy birthday",
+      tone: "everything",
+    })).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  });
+});
