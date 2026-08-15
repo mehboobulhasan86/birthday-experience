@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ArrowRight, Loader2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, X } from "lucide-react";
 import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { DynamicBirthdayScene } from "@/components/DynamicBirthdayScene";
 
 export default function BirthdayReader() {
   const [, params] = useRoute("/birthday/:slug");
@@ -11,19 +12,17 @@ export default function BirthdayReader() {
 
   if (isLoading) return <main className="recipient-world scene-0"><div className="generation-center"><Loader2 className="spin" size={28} /><p className="generation-kicker">OPENING YOUR PRIVATE CUT</p></div></main>;
   if (error || !data) return <main className="recipient-world scene-0"><div className="generation-center"><p className="generation-kicker">THIS EXPERIENCE HAS GONE QUIET</p><h1>That link is no longer available.</h1></div></main>;
-  const current = data.blueprint.scenes[Math.min(scene, data.blueprint.scenes.length - 1)];
-  const next = () => setScene((value) => Math.min(value + 1, data.blueprint.scenes.length - 1));
-  return <main className={`recipient-world scene-${scene}`}>
+
+  const scenes = data.blueprint.scenes;
+  const current = scenes[Math.min(scene, scenes.length - 1)];
+  const next = () => setScene((value) => Math.min(value + 1, scenes.length - 1));
+  const previous = () => setScene((value) => Math.max(value - 1, 0));
+
+  return <main className={`recipient-world scene-${scene} blueprint-style-${data.blueprint.visual_style} blueprint-arc-${data.blueprint.arc_type} blueprint-mood-${data.blueprint.music_mood}`}>
     <button className="recipient-close" onClick={() => window.location.href = "/"}><X size={17} /></button>
-    <div className="recipient-progress">{data.blueprint.scenes.map((_, index) => <span key={index} className={index <= scene ? "active" : ""} />)}</div>
-    <section className="reader-scene">
-      <p className="scene-kicker">PRIVATE CUT / {String(scene + 1).padStart(2, "0")}</p>
-      <p className="scene-setup">{current.setup}</p>
-      <h1>{current.beats[0]}</h1>
-      <div className="reader-beats">{current.beats.slice(1).map((beat) => <p key={beat}>{beat}</p>)}</div>
-      {current.punchline && <p className="scene-punchline">{current.punchline}</p>}
-      {scene < data.blueprint.scenes.length - 1 && <button className="scene-next" onClick={next}>Keep going <ArrowRight size={17} /></button>}
-      {scene === data.blueprint.scenes.length - 1 && <button className="scene-next" onClick={() => navigator.share?.({ title: `Birthday Experience for ${data.recipientName}`, url: window.location.href })}>Share this little world <ArrowRight size={17} /></button>}
-    </section>
+    <div className="recipient-scene"><div className="scene-index">{String(scene + 1).padStart(2, "0")} <span>/ {String(scenes.length).padStart(2, "0")}</span></div>
+      <DynamicBirthdayScene scene={current} index={scene} total={scenes.length} recipientName={data.recipientName} creatorMessage={data.blueprint.creator_message} visualStyle={data.blueprint.visual_style} arcType={data.blueprint.arc_type} musicMood={data.blueprint.music_mood} overallPacing={data.blueprint.pacing.overall} onNext={scene < scenes.length - 1 ? next : undefined} onShare={scene === scenes.length - 1 ? () => navigator.share?.({ title: `Birthday Experience for ${data.recipientName}`, url: window.location.href }) : undefined} />
+    </div>
+    <div className="recipient-controls">{scene > 0 && <button onClick={previous}><ArrowLeft size={16} /> Previous</button>}<div className="scene-dots">{scenes.map((_, index) => <span key={index} className={index === scene ? "active" : ""} />)}</div>{scene < scenes.length - 1 && <button onClick={next}>Continue <ArrowRight size={16} /></button>}</div>
   </main>;
 }

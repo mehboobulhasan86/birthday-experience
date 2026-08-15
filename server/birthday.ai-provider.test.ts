@@ -25,7 +25,7 @@ describe("configured birthday AI provider", () => {
       name: "Maya",
       nickname: "May",
       relationship: "Best friend",
-      about: "We got lost together in Lahore after a cricket match.",
+      about: "Maya is the friend who turns every quiet evening into a competitive cricket match, keeps a running list of terrible puns, and once got us lost in Lahore while searching for the best chai. We have supported each other through career changes and still laugh at the same old voice note.",
       message: "Happy birthday, May. More ridiculous adventures ahead.",
       tone: "everything",
     });
@@ -34,5 +34,9 @@ describe("configured birthday AI provider", () => {
     expect(result.fallback).toBe(false);
     expect(result.blueprint.recipient.name).toBe("Maya");
     expect(result.blueprint.scenes.length).toBeGreaterThanOrEqual(5);
-  }, 45_000);
+    expect(new Set(result.blueprint.scenes.map((scene) => scene.type)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(result.blueprint.scenes.map((scene) => scene.visual_concept)).size).toBeGreaterThanOrEqual(4);
+    expect(result.blueprint.scenes.every((scene) => scene.setup.length > 0 && scene.beats.length > 0)).toBe(true);
+    expect(JSON.stringify(result.blueprint).toLowerCase()).toContain("maya");
+  }, 90_000);
 });

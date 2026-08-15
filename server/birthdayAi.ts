@@ -10,12 +10,12 @@ const schema = {
     visual_style: { type: "string", enum: ["bestfriend", "romantic", "family", "playful", "editorial"] },
     arc_type: { type: "string", enum: ["roast_to_sincere", "curious_to_warm", "playful_to_sincere", "quiet_to_joyful"] },
     primary_personalization_anchor: { type: "string" },
-    personalization_anchors: { type: "array", items: { type: "string" } },
+    personalization_anchors: { type: "array", maxItems: 4, items: { type: "string", maxLength: 120 } },
     music_mood: { type: "string", enum: ["upbeat_then_soft", "bright", "soft", "cinematic"] },
     pacing: { type: "object", additionalProperties: false, required: ["overall", "scene_transition"], properties: { overall: { type: "string" }, scene_transition: { type: "string", enum: ["cinematic", "snappy", "gentle"] } } },
     creator_message: { type: "string" },
     source_details: { type: "string" },
-    scenes: { type: "array", minItems: 5, maxItems: 10, items: { type: "object", additionalProperties: false, required: ["type", "importance", "visual_concept", "interaction", "setup", "beats", "punchline", "pacing", "confirmed_details"], properties: { type: { type: "string", enum: ["mystery", "nickname", "hobby", "inside_joke", "memory", "roast", "emotional", "message", "celebration", "one_more_thing"] }, importance: { type: "string", enum: ["supporting", "primary", "climax"] }, visual_concept: { type: "string", minLength: 1 }, interaction: { type: "string", enum: ["tap_to_reveal", "tap_to_advance", "none"] }, setup: { type: "string" }, beats: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } }, punchline: { type: "string" }, pacing: { type: "string", enum: ["quick", "steady", "slow_build", "quiet"] }, confirmed_details: { type: "array", items: { type: "string" } } } } },
+    scenes: { type: "array", minItems: 5, maxItems: 5, items: { type: "object", additionalProperties: false, required: ["type", "importance", "visual_concept", "interaction", "setup", "beats", "punchline", "pacing", "confirmed_details"], properties: { type: { type: "string", enum: ["mystery", "nickname", "hobby", "inside_joke", "memory", "roast", "emotional", "message", "celebration", "one_more_thing"] }, importance: { type: "string", enum: ["supporting", "primary", "climax"] }, visual_concept: { type: "string", minLength: 1, maxLength: 80 }, interaction: { type: "string", enum: ["tap_to_reveal", "tap_to_advance", "none"] }, setup: { type: "string", minLength: 1, maxLength: 180 }, beats: { type: "array", minItems: 1, maxItems: 3, items: { type: "string", minLength: 1, maxLength: 140 } }, punchline: { type: "string", maxLength: 140 }, pacing: { type: "string", enum: ["quick", "steady", "slow_build", "quiet"] }, confirmed_details: { type: "array", maxItems: 3, items: { type: "string", maxLength: 80 } } } } },
   },
 } as const;
 
@@ -26,8 +26,8 @@ export async function generateBlueprint(raw: ExperienceInput): Promise<{ bluepri
     const response = await invokeLLM({
       model: process.env.BIRTHDAY_AI_MODEL,
       messages: [
-        { role: "system", content: "You are the creative director of Birthday Experience. Return only a strict JSON Experience Blueprint. Use only confirmed details from the creator brief. Never invent locations, names, memories, or facts. If a detail is uncertain, omit it." },
-        { role: "user", content: JSON.stringify({ task: "Create a personalized birthday journey blueprint", input }) },
+        { role: "system", content: "You are the creative director of Birthday Experience. Return only a strict JSON Experience Blueprint. This is not a nickname substitution task: transform the complete creator brief into an original mini-story. Use the relationship to choose intimacy and language, use the tone to choose comedic versus tender beats, and mine the about text for concrete habits, hobbies, memories, places, phrases, and inside jokes. Never invent locations, names, memories, or facts; if a detail is uncertain, omit it. Choose an arc_type and visual_style that fit this specific person. Create exactly 5 concise scenes with a beginning, middle, and emotional payoff. Do not repeat a scene type; use at least three different types. Keep each visual_concept, setup, punchline, and beat short and specific so the JSON remains compact. The scenes must not default to a generic name reveal, scoreboard, map, message, or celebration sequence unless the creator brief genuinely supports that treatment." },
+        { role: "user", content: JSON.stringify({ task: "Compose a one-off birthday experience from every available input field", requirements: ["Make habits, bond, memories, story details, and tone visible in the scenes", "Let the scene array determine the sequence and visual treatment", "Prefer specific details over generic birthday language"], input }) },
       ],
       response_format: { type: "json_schema", json_schema: { name: "experience_blueprint", strict: true, schema } },
     });

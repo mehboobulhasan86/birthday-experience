@@ -4,25 +4,34 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Copy, Heart, MapPin, MessageCircle, Play, RotateCcw, Share2, Sparkles, Volume2, WandSparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { demoBlueprint } from "@shared/birthday";
+import { DynamicBirthdayScene } from "@/components/DynamicBirthdayScene";
 
 type Relationship = "Best friend" | "Partner" | "Parent" | "Sibling" | "Colleague" | "Other";
 type Tone = "laugh" | "heartfelt" | "roast" | "everything";
 type Step = 1 | 2 | 3;
-type Scene = { type: string; setup: string; beats: string[]; punchline: string; confirmed_details: string[] };
+type Scene = { type: string; importance?: string; visual_concept?: string; interaction?: "tap_to_reveal" | "tap_to_advance" | "none"; setup: string; beats: string[]; punchline: string; pacing?: string; confirmed_details: string[] };
 type Blueprint = {
   recipient: { name: string; nickname: string; relationship: Relationship };
   about: string;
   message: string;
   tone: Tone;
   scenes?: Scene[];
+  visual_style?: "bestfriend" | "romantic" | "family" | "playful" | "editorial";
+  arc_type?: "roast_to_sincere" | "curious_to_warm" | "playful_to_sincere" | "quiet_to_joyful";
+  music_mood?: "upbeat_then_soft" | "bright" | "soft" | "cinematic";
+  pacing?: { overall?: string; scene_transition?: "cinematic" | "snappy" | "gentle" };
 };
 
-const DEMO: Blueprint = {
-  recipient: { name: "Ahmed", nickname: "Shani", relationship: "Best friend" },
+const DEMO_INPUT = {
+  name: "Ahmed",
+  nickname: "Shani",
+  relationship: "Best friend" as Relationship,
   about: "Shani is competitive, obsessed with cricket, thinks he's hilarious, and we once got completely lost in Lahore for three hours. We also stayed up all night gaming once. He always thinks he can beat everyone at everything.",
   message: "Happy birthday bro. Honestly I don't know how you've survived another year. We've had some ridiculous memories and I genuinely wouldn't trade any of them. Stay exactly the same idiot you are.",
-  tone: "everything",
+  tone: "everything" as Tone,
 };
+const DEMO: Blueprint = { ...DEMO_INPUT, ...demoBlueprint(DEMO_INPUT) };
 
 const tones: { value: Tone; label: string; icon: string }[] = [
   { value: "laugh", label: "Make them laugh", icon: "↗" },
@@ -158,8 +167,26 @@ function StepThree({ form, setForm }: { form: Blueprint; setForm: (form: Bluepri
 
 function Generation({ name, line }: { name: string; line: number }) { const lines = [`Getting to know ${name}...`, "Finding the best parts...", "Building something around that Lahore story...", "Making it personal...", "Putting it all together...", "Almost ready..."]; return <main className="generation-page"><div className="generation-center"><div className="generation-mark">╱</div><p className="generation-kicker">A PRIVATE CUT FOR {name.toUpperCase()}</p><h1>{lines[Math.min(line, lines.length - 1)]}</h1><div className="generation-line"><span style={{ width: `${Math.min(100, (line + 1) * 17)}%` }} /></div><div className="generation-caption"><span className="pulse-dot" /> Turning the good stuff into a little world.</div></div><div className="generation-corner">BIRTHDAY<br />EXPERIENCE / 01</div></main>; }
 
-function Recipient({ blueprint, scene, setScene, mapRevealed, setMapRevealed, sound, setSound, onClose, onShare }: { blueprint: Blueprint; scene: number; setScene: (scene: number) => void; mapRevealed: boolean; setMapRevealed: (value: boolean) => void; sound: boolean; setSound: (value: boolean) => void; onClose: () => void; onShare: () => void }) { const name = blueprint.recipient.nickname || blueprint.recipient.name; const sceneData = blueprint.scenes?.[scene]; const next = () => setScene(Math.min(scene + 1, 5)); const previous = () => setScene(Math.max(scene - 1, 0)); return <main className={`recipient-world scene-${scene}`}>
-<button className="recipient-close" onClick={onClose}><X size={17} /></button><button className="sound-toggle" onClick={() => setSound(!sound)}>{sound ? <Volume2 size={15} /> : <Volume2 size={15} />} {sound ? "Sound on" : "Sound off"}</button><div className="recipient-scene"><div className="scene-index">{String(scene + 1).padStart(2, "0")} <span>/ 06</span></div>{scene === 0 && <OpenScene onOpen={next} name={name} />}{scene === 1 && <NicknameScene name={name} onNext={next} />}{scene === 2 && <CricketScene onNext={next} scene={sceneData} />}{scene === 3 && <MapScene revealed={mapRevealed} setRevealed={setMapRevealed} onNext={next} scene={sceneData} />}{scene === 4 && <MessageScene message={blueprint.message} onNext={next} />}{scene === 5 && <CelebrationScene name={name} message={blueprint.message} onShare={onShare} />}</div><div className="recipient-controls">{scene > 0 && <button onClick={previous}><ArrowLeft size={16} /> Previous</button>}<div className="scene-dots">{[0,1,2,3,4,5].map((dot) => <span key={dot} className={dot === scene ? "active" : ""} />)}</div>{scene < 5 && <button onClick={next}>Continue <ArrowRight size={16} /></button>}</div></main>; }
+function Recipient({ blueprint, scene, setScene, mapRevealed, setMapRevealed, sound, setSound, onClose, onShare }: { blueprint: Blueprint; scene: number; setScene: (scene: number) => void; mapRevealed: boolean; setMapRevealed: (value: boolean) => void; sound: boolean; setSound: (value: boolean) => void; onClose: () => void; onShare: () => void }) {
+  const name = blueprint.recipient.nickname || blueprint.recipient.name;
+  const generatedScenes = blueprint.scenes || [];
+  const isDynamic = generatedScenes.length > 0;
+  const total = isDynamic ? generatedScenes.length + 2 : 6;
+  const finalScene = total - 1;
+  const next = () => setScene(Math.min(scene + 1, finalScene));
+  const previous = () => setScene(Math.max(scene - 1, 0));
+  const sceneData = isDynamic ? generatedScenes[scene - 1] : undefined;
+  return <main className={`recipient-world scene-${scene} blueprint-style-${blueprint.visual_style || "bestfriend"} blueprint-arc-${blueprint.arc_type || "playful_to_sincere"} blueprint-mood-${blueprint.music_mood || "cinematic"}`}>
+    <button className="recipient-close" onClick={onClose}><X size={17} /></button><button className="sound-toggle" onClick={() => setSound(!sound)}>{sound ? <Volume2 size={15} /> : <Volume2 size={15} />} {sound ? "Sound on" : "Sound off"}</button><div className="recipient-scene"><div className="scene-index">{String(scene + 1).padStart(2, "0")} <span>/ {String(total).padStart(2, "0")}</span></div>
+      {scene === 0 && <OpenScene onOpen={next} name={name} />}
+      {isDynamic && scene > 0 && scene < finalScene && sceneData && <DynamicBirthdayScene scene={sceneData as any} index={scene - 1} total={generatedScenes.length} recipientName={name} creatorMessage={blueprint.message} visualStyle={blueprint.visual_style} arcType={blueprint.arc_type} musicMood={blueprint.music_mood} overallPacing={blueprint.pacing?.overall} onNext={next} onShare={scene === finalScene - 1 ? onShare : undefined} />}
+      {!isDynamic && scene === 1 && <NicknameScene name={name} onNext={next} />}
+      {!isDynamic && scene === 2 && <CricketScene onNext={next} />}
+      {!isDynamic && scene === 3 && <MapScene revealed={mapRevealed} setRevealed={setMapRevealed} onNext={next} />}
+      {!isDynamic && scene === 4 && <MessageScene message={blueprint.message} onNext={next} />}
+      {scene === finalScene && <CelebrationScene name={name} message={blueprint.message} onShare={onShare} />}
+    </div><div className="recipient-controls">{scene > 0 && <button onClick={previous}><ArrowLeft size={16} /> Previous</button>}<div className="scene-dots">{Array.from({ length: total }, (_, dot) => <span key={dot} className={dot === scene ? "active" : ""} />)}</div>{scene < finalScene && <button onClick={next}>Continue <ArrowRight size={16} /></button>}</div></main>;
+}
 
 function OpenScene({ onOpen, name }: { onOpen: () => void; name: string }) { return <div className="open-scene"><div className="recipient-kicker">A PRIVATE CUT FOR {name.toUpperCase()}</div><h1>Someone made<br /><em>something</em> for you<span>...</span></h1><button className="gift-object" onClick={onOpen}><div className="gift-lid" /><div className="gift-body"><span className="gift-ribbon" /></div><div className="gift-spark">✦</div></button><button className="tap-open" onClick={onOpen}>Tap to open <ArrowRight size={16} /></button></div>; }
 function NicknameScene({ name, onNext }: { name: string; onNext: () => void }) { return <div className="nickname-scene"><div className="recipient-kicker">SCENE 01 / THE NAME</div><h2>There was one name<br />only certain people use<span>...</span></h2><div className="reveal-name">{name.toUpperCase()}</div><p className="scene-caption">The one that somehow suits you better.</p><button className="scene-cta" onClick={onNext}>Keep going <ArrowRight size={16} /></button></div>; }

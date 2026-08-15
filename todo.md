@@ -38,3 +38,10 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Connect the Manus built-in LLM securely on the server and verify real personalized generation.
 - [x] Align the structured LLM schema with the strict Experience Blueprint validator.
 - [x] Validate the provider health check, real blueprint generation, full test suite, and production build.
+- [x] Replace the rigid recipient template with AI-driven scene composition, personalization, interactions, and visual variation based on the full creator brief.
+- [x] Wire the dynamic AI scene renderer into both the private preview and public birthday reader.
+- [x] Strengthen the real-provider prompt and strict schema for distinct scene types and visual concepts.
+- [x] Validate multiple personalized scene outputs with the real provider, full Vitest suite, and production build.
+- [x] Drive full-experience visual treatment from blueprint visual_style, arc_type, music_mood, and pacing.
+- [x] Add a deterministic contract test proving materially different briefs map to different scene families and pacing classes.
+- [x] Ensure fallback/demo blueprints use the same dynamic renderer instead of reverting to rigid scenes.
