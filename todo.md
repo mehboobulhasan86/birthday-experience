@@ -71,3 +71,4 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Resolve the intermittent real-provider timeout without weakening grounded fallback behavior, then rerun tests and build; bounded 45-second fallback deadline, 8 tests, and production build pass.
 - [x] Reset every new-card entry point, including SharePage, to a blank brief so demo Shani/cricket/Lahore data cannot leak into a fresh profile.
 - [ ] Publish the final creator-reset and bounded-provider changes to GitHub/Vercel and rerun Mimi versus Raf production validation.
+- [x] Clear the Step 02 default About-text demo string and replace its visible placeholder with neutral guidance; 8 tests and production build pass, with no remaining merge markers.
