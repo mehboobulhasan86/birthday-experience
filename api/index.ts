@@ -1,5 +1,3 @@
-import "dotenv/config";
-
 import { createExpressApp } from "../server/_core/index";
 
 
