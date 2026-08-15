@@ -10,7 +10,20 @@ import { DynamicBirthdayScene } from "@/components/DynamicBirthdayScene";
 type Relationship = "Best friend" | "Partner" | "Parent" | "Sibling" | "Colleague" | "Other";
 type Tone = "laugh" | "heartfelt" | "roast" | "everything";
 type Step = 1 | 2 | 3;
-type Scene = { type: string; importance?: string; visual_concept?: string; interaction?: "tap_to_reveal" | "tap_to_advance" | "none"; setup: string; beats: string[]; punchline: string; pacing?: string; confirmed_details: string[] };
+type Scene = {
+  type: string;
+  render_mode?: "poster" | "polaroid" | "journal" | "dashboard" | "map" | "letter";
+  importance?: "supporting" | "primary" | "climax" | string;
+  visual_concept?: string;
+  asset_direction?: string;
+  asset_tokens?: { background: string; texture: string; lighting: string; typography: string; motif: string };
+  interaction?: "tap_to_reveal" | "tap_to_advance" | "none";
+  setup: string;
+  beats: string[];
+  punchline: string;
+  pacing?: string;
+  confirmed_details: string[];
+};
 type Blueprint = {
   recipient: { name: string; nickname: string; relationship: Relationship };
   about: string;
@@ -78,7 +91,18 @@ export default function Home() {
     try {
       const result = await generateExperience.mutateAsync({ name: form.recipient.name, nickname: form.recipient.nickname, relationship: form.recipient.relationship, about: form.about, message: form.message, tone: form.tone });
       setPublishedSlug(result.slug);
-      setForm((current) => ({ ...current, about: result.blueprint.source_details, message: result.blueprint.creator_message, recipient: result.blueprint.recipient }));
+      setForm((current) => ({
+        ...current,
+        about: result.blueprint.source_details,
+        message: result.blueprint.creator_message,
+        recipient: result.blueprint.recipient,
+        scenes: result.blueprint.scenes,
+        card_layout: result.blueprint.card_layout,
+        visual_style: result.blueprint.visual_style,
+        arc_type: result.blueprint.arc_type,
+        music_mood: result.blueprint.music_mood,
+        pacing: result.blueprint.pacing,
+      }));
       if (photoUpload && result.experienceId) {
         try {
           await addPhoto.mutateAsync({ experienceId: result.experienceId, ...photoUpload });
