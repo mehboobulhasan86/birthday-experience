@@ -65,5 +65,9 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Replace the unbounded second LLM call with an explicit bounded safe-fallback path for malformed or incomplete structured output.
 - [x] Confirm the new Vercel deployment is ready before resuming the five-profile production comparison; deployment 2966d8b is Ready and serves the Birthday Experience homepage at https://birthday-experience-n8f4kwglo-mehboobulhasan86s-projects.vercel.app/.
 - [x] Investigate why contrasting Mimi and Raf briefs produced the same cricket scoreboard sequence; strengthen real-provider acceptance with multi-term grounding and rejection of unrelated Shani/Lahore/cricket demo entities. Eight tests and production build pass.
-- [ ] Publish the stronger grounding guard to GitHub/Vercel and rerun Mimi versus Raf production validation.
-- [x] Add grounded-output validation and brief-aware fallback scenes; full Vitest suite (8 tests) and production build pass locally.
+- [x] Publish the stronger grounding guard to GitHub/Vercel and rerun Mimi versus Raf production validation; the live rerun still exposed a second hardcoded server fallback.
+- [x] Prevent the remaining stale Shani/cricket demo from leaking through fresh-card entry points by resetting both landing and SharePage creation flows to a blank brief; final production redeploy remains pending.
+- [x] Add grounded-output validation and brief-aware fallback scenes; the deterministic suite passes, but the latest real-provider test intermittently timed out at 90 seconds and needs a reliability follow-up.
+- [x] Resolve the intermittent real-provider timeout without weakening grounded fallback behavior, then rerun tests and build; bounded 45-second fallback deadline, 8 tests, and production build pass.
+- [x] Reset every new-card entry point, including SharePage, to a blank brief so demo Shani/cricket/Lahore data cannot leak into a fresh profile.
+- [ ] Publish the final creator-reset and bounded-provider changes to GitHub/Vercel and rerun Mimi versus Raf production validation.

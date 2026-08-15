@@ -37,6 +37,15 @@ type Blueprint = {
   pacing?: { overall?: string; scene_transition?: "cinematic" | "snappy" | "gentle" };
 };
 
+const BLANK_INPUT = {
+  name: "",
+  nickname: "",
+  relationship: "Other" as Relationship,
+  about: "",
+  message: "",
+  tone: "everything" as Tone,
+};
+
 const DEMO_INPUT = {
   name: "Ahmed",
   nickname: "Shani",
@@ -69,7 +78,7 @@ export default function Home() {
 
   const [mode, setMode] = useState<"landing" | "creator" | "generating" | "recipient" | "share">("landing");
   const [step, setStep] = useState<Step>(1);
-  const [form, setForm] = useState<Blueprint>(DEMO);
+  const [form, setForm] = useState<Blueprint>({ ...BLANK_INPUT, ...demoBlueprint(BLANK_INPUT) });
   const [scene, setScene] = useState(0);
   const [mapRevealed, setMapRevealed] = useState(false);
   const [sound, setSound] = useState(false);
@@ -83,7 +92,7 @@ export default function Home() {
   const slug = useMemo(() => slugFor(form.recipient.name, form.recipient.nickname), [form.recipient.name, form.recipient.nickname]);
 
   const updateRecipient = (key: keyof Blueprint["recipient"], value: string) => setForm((current) => ({ ...current, recipient: { ...current.recipient, [key]: value } as Blueprint["recipient"] }));
-  const beginCreator = () => { setMode("creator"); setStep(1); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const beginCreator = () => { setForm({ ...BLANK_INPUT, ...demoBlueprint(BLANK_INPUT) }); setPublishedSlug(null); setPhotoUpload(null); setMode("creator"); setStep(1); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const startGeneration = async () => {
     setMode("generating");
     setGenerationLine(0);
@@ -139,7 +148,7 @@ export default function Home() {
       {mode === "creator" && <Creator step={step} setStep={setStep} form={form} setForm={setForm} onBack={() => setMode("landing")} onGenerate={startGeneration} updateRecipient={updateRecipient} photoUpload={photoUpload} setPhotoUpload={setPhotoUpload} />}
       {mode === "generating" && <Generation name={form.recipient.nickname || form.recipient.name} line={generationLine} />}
       {mode === "recipient" && <Recipient blueprint={form} scene={scene} setScene={setScene} mapRevealed={mapRevealed} setMapRevealed={setMapRevealed} sound={sound} setSound={setSound} onClose={() => setMode("landing")} onShare={() => setMode("share")} />}
-      {mode === "share" && <SharePage blueprint={form} slug={publishedSlug ? `/birthday/${publishedSlug}` : slug} onPreview={() => { setMode("recipient"); setScene(0); }} onCreate={() => { setForm(DEMO); setMode("creator"); setStep(1); }} />}
+      {mode === "share" && <SharePage blueprint={form} slug={publishedSlug ? `/birthday/${publishedSlug}` : slug} onPreview={() => { setMode("recipient"); setScene(0); }} onCreate={() => { setForm({ ...BLANK_INPUT, ...demoBlueprint(BLANK_INPUT) }); setPublishedSlug(null); setPhotoUpload(null); setMode("creator"); setStep(1); }} />}
       {showDemo && <DemoModal onClose={() => setShowDemo(false)} onOpen={openDemo} />}
     </div>
   );

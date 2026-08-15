@@ -20,6 +20,22 @@ const schema = {
   },
 } as const;
 
+const REAL_PROVIDER_TIMEOUT_MS = 45_000;
+
+async function withDeadline<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Real provider timed out after ${timeoutMs}ms`)), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 export async function generateBlueprint(raw: ExperienceInput): Promise<{ blueprint: ExperienceBlueprint; provider: "mock" | "real"; fallback: boolean }> {
   const input = sanitizeInput(raw);
   if (process.env.BIRTHDAY_AI_PROVIDER !== "real") return { blueprint: demoBlueprint(input), provider: "mock", fallback: false };
@@ -34,7 +50,7 @@ export async function generateBlueprint(raw: ExperienceInput): Promise<{ bluepri
       ],
       response_format: { type: "json_schema", json_schema: { name: "experience_blueprint", strict: true, schema } },
     });
-    const response = await request();
+    const response = await withDeadline(request(), REAL_PROVIDER_TIMEOUT_MS);
     const choice = response.choices?.[0];
     const content = choice?.message?.content;
     if (choice?.finish_reason === "length" || typeof content !== "string" || !content.trim()) {
