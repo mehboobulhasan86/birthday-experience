@@ -53,7 +53,7 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [ ] Validate two complete experiences visually and functionally before claiming the issue is fixed.
 - [ ] Create and compare five live cards for contrasting profiles in the cloud browser.
 - [x] Preserve the generated blueprint scenes and AI layout metadata in the private preview after the server response.
-- [ ] Push the stale-blueprint repair and current AI card-composer changes to GitHub main and redeploy Vercel.
+- [x] Push the stale-blueprint repair and current AI card-composer changes to GitHub main and trigger the Vercel redeploy.
 - [ ] Re-run the five-profile live comparison against the updated production deployment.
 - [ ] Verify the synced preview version and create five contrasting live cards for comparison.
 - [x] Fix the Vite HMR websocket mismatch between the proxied preview URL and the local dev server.
@@ -63,4 +63,6 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Reduce structured blueprint output complexity and switch the unreliable nano route to the built-in gpt-5-mini workhorse.
 - [x] Add explicit empty-content and finish_reason length guards to structured blueprint generation.
 - [x] Replace the unbounded second LLM call with an explicit bounded safe-fallback path for malformed or incomplete structured output.
-- [ ] Confirm the new Vercel deployment is ready before resuming the five-profile production comparison.
+- [x] Confirm the new Vercel deployment is ready before resuming the five-profile production comparison; deployment 2966d8b is Ready and serves the Birthday Experience homepage at https://birthday-experience-n8f4kwglo-mehboobulhasan86s-projects.vercel.app/.
+- [ ] Investigate why contrasting Mimi and Raf briefs produce the same cricket scoreboard sequence, then make production generation honor relationship and memory inputs.
+- [x] Add grounded-output validation and brief-aware fallback scenes; full Vitest suite (8 tests) and production build pass locally.
