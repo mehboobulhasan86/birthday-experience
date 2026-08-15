@@ -1,21 +1,19 @@
-# Vercel Redeploy Notes
-
-Source: https://vercel.com/mehboobulhasan86s-projects
+# Vercel Redeploy and LLM Notes
 
 The Vercel project is `birthday-experience`, linked to `mehboobulhasan86/birthday-experience`, with production domain `https://birthday-experience-alpha.vercel.app`.
 
 ## Deployment Fixes
 
-The Vercel serverless entrypoint was corrected in `api/index.ts` to avoid importing `dotenv/config` in the production runtime. The Vercel configuration in `vercel.json` preserves the `/api/:path*` rewrite and now also rewrites `/birthday/:slug*` to the SPA entrypoint, preventing direct public birthday links from returning Vercel `404 NOT_FOUND` responses.
+The Vercel serverless entrypoint in `api/index.ts` no longer imports `dotenv/config` in production. `vercel.json` preserves the `/api/:path*` rewrite and rewrites `/birthday/:slug*` to the SPA entrypoint so direct public birthday links resolve correctly.
 
-Relevant GitHub files are `vercel.json`, `api/index.ts`, and `server/_core/index.ts`. The routing fix was committed directly to the `main` branch through the authenticated GitHub session.
+## Manus Built-in LLM
+
+Real generation is enabled server-side with `BIRTHDAY_AI_PROVIDER=real` and model `gpt-5-nano`. No API key was added to the frontend. The existing deterministic fallback remains active if a provider request fails or the returned blueprint does not pass validation.
+
+The structured JSON schema in `server/birthdayAi.ts` was tightened to match the shared Zod contract, including scene type, importance, interaction, pacing, non-empty visual concepts, and non-empty beat arrays. This prevents valid model responses from being rejected by mismatched enum or minimum-value rules.
 
 ## Validation
 
-The local post-fix production build completed successfully with `pnpm build`. The Vitest suite completed successfully with 2 test files and 4 tests passing. The live creator flow was exercised through brief creation, generation, six-scene recipient playback, final share screen, and public reader navigation.
+The lightweight Manus provider health test passed. A real structured birthday blueprint generation test passed with `provider: "real"` and `fallback: false`. The full suite passed with 3 test files and 6 tests. The production build also passed with `pnpm build`.
 
-After the routing fix redeployed, the public URL `https://birthday-experience-alpha.vercel.app/birthday/shani-x7k2` resolved to the Birthday Experience SPA instead of Vercel's 404 page, confirming the reader-route fallback is active.
-
-## Remaining Limitation
-
-The experience currently uses the project's mock-first AI fallback unless a real structured LLM provider is explicitly enabled and configured server-side. The production flow is therefore functional and cost-controlled, but generated copy is not yet backed by a live external LLM provider.
+The creator flow now uses the Manus LLM for personalized blueprint generation when the environment is configured, while preserving strict cost limits and validation. The public recipient experience continues to render persisted blueprints at `/birthday/:slug`.

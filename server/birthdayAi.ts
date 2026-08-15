@@ -15,7 +15,7 @@ const schema = {
     pacing: { type: "object", additionalProperties: false, required: ["overall", "scene_transition"], properties: { overall: { type: "string" }, scene_transition: { type: "string", enum: ["cinematic", "snappy", "gentle"] } } },
     creator_message: { type: "string" },
     source_details: { type: "string" },
-    scenes: { type: "array", minItems: 5, maxItems: 10, items: { type: "object", additionalProperties: false, required: ["type", "importance", "visual_concept", "interaction", "setup", "beats", "punchline", "pacing", "confirmed_details"], properties: { type: { type: "string" }, importance: { type: "string" }, visual_concept: { type: "string" }, interaction: { type: "string" }, setup: { type: "string" }, beats: { type: "array", items: { type: "string" } }, punchline: { type: "string" }, pacing: { type: "string" }, confirmed_details: { type: "array", items: { type: "string" } } } } },
+    scenes: { type: "array", minItems: 5, maxItems: 10, items: { type: "object", additionalProperties: false, required: ["type", "importance", "visual_concept", "interaction", "setup", "beats", "punchline", "pacing", "confirmed_details"], properties: { type: { type: "string", enum: ["mystery", "nickname", "hobby", "inside_joke", "memory", "roast", "emotional", "message", "celebration", "one_more_thing"] }, importance: { type: "string", enum: ["supporting", "primary", "climax"] }, visual_concept: { type: "string", minLength: 1 }, interaction: { type: "string", enum: ["tap_to_reveal", "tap_to_advance", "none"] }, setup: { type: "string" }, beats: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } }, punchline: { type: "string" }, pacing: { type: "string", enum: ["quick", "steady", "slow_build", "quiet"] }, confirmed_details: { type: "array", items: { type: "string" } } } } },
   },
 } as const;
 
@@ -35,7 +35,12 @@ export async function generateBlueprint(raw: ExperienceInput): Promise<{ bluepri
     const text = typeof content === "string" ? content : JSON.stringify(content);
     const parsed = JSON.parse(text);
     const validated = experienceBlueprintSchema.safeParse(parsed);
-    if (!validated.success) throw new Error("Blueprint validation failed");
+    if (!validated.success) {
+      const issueSummary = validated.error.issues
+        .map(issue => `${issue.path.join(".") || "root"}: ${issue.message}`)
+        .join("; ");
+      throw new Error(`Blueprint validation failed: ${issueSummary}`);
+    }
     return { blueprint: validated.data, provider: "real", fallback: false };
   } catch (error) {
     console.warn("[Birthday AI] Real provider failed; using deterministic fallback", error);

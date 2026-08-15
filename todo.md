@@ -35,3 +35,6 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Fix Vercel SPA fallback so public /birthday/:slug reader links resolve instead of returning 404.
 - [x] Run and record a local post-fix production build and Vitest validation.
 - [x] Document the final deployment status, public URL, and remaining mock-AI limitation.
+- [x] Connect the Manus built-in LLM securely on the server and verify real personalized generation.
+- [x] Align the structured LLM schema with the strict Experience Blueprint validator.
+- [x] Validate the provider health check, real blueprint generation, full test suite, and production build.
