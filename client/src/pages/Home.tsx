@@ -1,7 +1,9 @@
 // Paper Lantern Cinema: the creator is calm and editorial; the recipient is cinematic, tactile, and specific.
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Copy, Heart, MapPin, MessageCircle, Play, RotateCcw, Share2, Sparkles, Volume2, WandSparkles, X } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 type Relationship = "Best friend" | "Partner" | "Parent" | "Sibling" | "Colleague" | "Other";
 type Tone = "laugh" | "heartfelt" | "roast" | "everything";
@@ -33,6 +35,13 @@ function slugFor(name: string, nickname: string) {
 }
 
 export default function Home() {
+  // The useAuth hook provides authentication state.
+  // To implement login/logout, call logout(), or start login from an event
+  // handler: onClick={() => startLogin()} (imported from "@/const"). Never call
+  // startLogin() during render (no href={startLogin()}) — it mints a one-time
+  // nonce cookie and must run only at the moment of navigation.
+  let { user, loading, error, isAuthenticated, logout } = useAuth();
+
   const [mode, setMode] = useState<"landing" | "creator" | "generating" | "recipient" | "share">("landing");
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<Blueprint>(DEMO);
@@ -41,12 +50,27 @@ export default function Home() {
   const [sound, setSound] = useState(false);
   const [generationLine, setGenerationLine] = useState(0);
   const [showDemo, setShowDemo] = useState(false);
+  const [publishedSlug, setPublishedSlug] = useState<string | null>(null);
+  const generateExperience = trpc.birthday.generate.useMutation();
 
   const slug = useMemo(() => slugFor(form.recipient.name, form.recipient.nickname), [form.recipient.name, form.recipient.nickname]);
 
   const updateRecipient = (key: keyof Blueprint["recipient"], value: string) => setForm((current) => ({ ...current, recipient: { ...current.recipient, [key]: value } as Blueprint["recipient"] }));
   const beginCreator = () => { setMode("creator"); setStep(1); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const startGeneration = () => { setMode("generating"); setGenerationLine(0); };
+  const startGeneration = async () => {
+    setMode("generating");
+    setGenerationLine(0);
+    if (!isAuthenticated) return;
+    try {
+      const result = await generateExperience.mutateAsync({ name: form.recipient.name, nickname: form.recipient.nickname, relationship: form.recipient.relationship, about: form.about, message: form.message, tone: form.tone });
+      setPublishedSlug(result.slug);
+      setForm((current) => ({ ...current, about: result.blueprint.source_details, message: result.blueprint.creator_message, recipient: result.blueprint.recipient }));
+      toast.success(result.fallback ? "Your private cut is ready with our safe fallback director." : "Your private cut is ready.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "We couldn't make the experience yet.");
+      setMode("creator");
+    }
+  };
 
   useEffect(() => {
     if (mode !== "generating") return;
@@ -61,7 +85,7 @@ export default function Home() {
     }
   }, [mode, generationLine]);
 
-  const openDemo = () => { setForm(DEMO); setMode("recipient"); setScene(0); setMapRevealed(false); setShowDemo(false); };
+  const openDemo = () => { setForm(DEMO); setPublishedSlug(null); setMode("recipient"); setScene(0); setMapRevealed(false); setShowDemo(false); };
 
   return (
     <div className="app-shell">
@@ -69,7 +93,7 @@ export default function Home() {
       {mode === "creator" && <Creator step={step} setStep={setStep} form={form} setForm={setForm} onBack={() => setMode("landing")} onGenerate={startGeneration} updateRecipient={updateRecipient} />}
       {mode === "generating" && <Generation name={form.recipient.nickname || form.recipient.name} line={generationLine} />}
       {mode === "recipient" && <Recipient blueprint={form} scene={scene} setScene={setScene} mapRevealed={mapRevealed} setMapRevealed={setMapRevealed} sound={sound} setSound={setSound} onClose={() => setMode("landing")} onShare={() => setMode("share")} />}
-      {mode === "share" && <SharePage blueprint={form} slug={slug} onPreview={() => { setMode("recipient"); setScene(0); }} onCreate={() => { setForm(DEMO); setMode("creator"); setStep(1); }} />}
+      {mode === "share" && <SharePage blueprint={form} slug={publishedSlug ? `/birthday/${publishedSlug}` : slug} onPreview={() => { setMode("recipient"); setScene(0); }} onCreate={() => { setForm(DEMO); setMode("creator"); setStep(1); }} />}
       {showDemo && <DemoModal onClose={() => setShowDemo(false)} onOpen={openDemo} />}
     </div>
   );

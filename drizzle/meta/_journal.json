@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1786768354485,
+      "tag": "0000_pale_sebastian_shaw",
+      "breakpoints": true
+    }
+  ]
+}
