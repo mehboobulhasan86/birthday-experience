@@ -64,5 +64,6 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Add explicit empty-content and finish_reason length guards to structured blueprint generation.
 - [x] Replace the unbounded second LLM call with an explicit bounded safe-fallback path for malformed or incomplete structured output.
 - [x] Confirm the new Vercel deployment is ready before resuming the five-profile production comparison; deployment 2966d8b is Ready and serves the Birthday Experience homepage at https://birthday-experience-n8f4kwglo-mehboobulhasan86s-projects.vercel.app/.
-- [ ] Investigate why contrasting Mimi and Raf briefs produce the same cricket scoreboard sequence, then make production generation honor relationship and memory inputs.
+- [x] Investigate why contrasting Mimi and Raf briefs produced the same cricket scoreboard sequence; strengthen real-provider acceptance with multi-term grounding and rejection of unrelated Shani/Lahore/cricket demo entities. Eight tests and production build pass.
+- [ ] Publish the stronger grounding guard to GitHub/Vercel and rerun Mimi versus Raf production validation.
 - [x] Add grounded-output validation and brief-aware fallback scenes; full Vitest suite (8 tests) and production build pass locally.

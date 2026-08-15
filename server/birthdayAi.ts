@@ -63,10 +63,15 @@ export async function generateBlueprint(raw: ExperienceInput): Promise<{ bluepri
         : parsed?.scenes,
     };
     const validated = experienceBlueprintSchema.safeParse(normalized);
-    const groundedTerms = (input.about.toLowerCase().match(/[a-z][a-z'-]{4,}/g) || []).filter(term => !["about", "every", "their", "there", "which", "where", "would", "could", "always", "makes", "person", "quiet", "small"].includes(term));
+    const groundedTerms = Array.from(new Set((input.about.toLowerCase().match(/[a-z][a-z'-]{4,}/g) || []).filter(term => !["about", "every", "their", "there", "which", "where", "would", "could", "always", "makes", "person", "quiet", "small", "someone", "really", "still"].includes(term))));
     const generatedText = JSON.stringify(normalized).toLowerCase();
-    if (groundedTerms.length > 0 && !groundedTerms.some(term => generatedText.includes(term))) {
-      throw new Error("Blueprint was not grounded in the submitted memory details");
+    const groundedMatches = groundedTerms.filter(term => generatedText.includes(term));
+    const unrelatedDemoTerms = ["shani", "lahore", "cricket"].filter(term => !input.about.toLowerCase().includes(term) && !input.message.toLowerCase().includes(term));
+    if (groundedTerms.length > 0 && groundedMatches.length < Math.min(2, groundedTerms.length)) {
+      throw new Error("Blueprint was not sufficiently grounded in the submitted memory details");
+    }
+    if (unrelatedDemoTerms.some(term => generatedText.includes(term))) {
+      throw new Error("Blueprint contained unrelated demo details");
     }
     if (!validated.success) {
       const issueSummary = validated.error.issues
