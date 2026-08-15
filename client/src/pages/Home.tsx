@@ -17,6 +17,7 @@ type Blueprint = {
   message: string;
   tone: Tone;
   scenes?: Scene[];
+  card_layout?: "cinema" | "scrapbook" | "editorial" | "terminal" | "postcard";
   visual_style?: "bestfriend" | "romantic" | "family" | "playful" | "editorial";
   arc_type?: "roast_to_sincere" | "curious_to_warm" | "playful_to_sincere" | "quiet_to_joyful";
   music_mood?: "upbeat_then_soft" | "bright" | "soft" | "cinematic";
@@ -179,7 +180,7 @@ function Recipient({ blueprint, scene, setScene, mapRevealed, setMapRevealed, so
   return <main className={`recipient-world scene-${scene} blueprint-style-${blueprint.visual_style || "bestfriend"} blueprint-arc-${blueprint.arc_type || "playful_to_sincere"} blueprint-mood-${blueprint.music_mood || "cinematic"}`}>
     <button className="recipient-close" onClick={onClose}><X size={17} /></button><button className="sound-toggle" onClick={() => setSound(!sound)}>{sound ? <Volume2 size={15} /> : <Volume2 size={15} />} {sound ? "Sound on" : "Sound off"}</button><div className="recipient-scene"><div className="scene-index">{String(scene + 1).padStart(2, "0")} <span>/ {String(total).padStart(2, "0")}</span></div>
       {scene === 0 && <OpenScene onOpen={next} name={name} />}
-      {isDynamic && scene > 0 && scene < finalScene && sceneData && <DynamicBirthdayScene scene={sceneData as any} index={scene - 1} total={generatedScenes.length} recipientName={name} creatorMessage={blueprint.message} visualStyle={blueprint.visual_style} arcType={blueprint.arc_type} musicMood={blueprint.music_mood} overallPacing={blueprint.pacing?.overall} onNext={next} onShare={scene === finalScene - 1 ? onShare : undefined} />}
+      {isDynamic && scene > 0 && scene < finalScene && sceneData && <DynamicBirthdayScene scene={sceneData as any} index={scene - 1} total={generatedScenes.length} recipientName={name} creatorMessage={blueprint.message} cardLayout={blueprint.card_layout} visualStyle={blueprint.visual_style} arcType={blueprint.arc_type} musicMood={blueprint.music_mood} overallPacing={blueprint.pacing?.overall} onNext={next} onShare={scene === finalScene - 1 ? onShare : undefined} />}
       {!isDynamic && scene === 1 && <NicknameScene name={name} onNext={next} />}
       {!isDynamic && scene === 2 && <CricketScene onNext={next} />}
       {!isDynamic && scene === 3 && <MapScene revealed={mapRevealed} setRevealed={setMapRevealed} onNext={next} />}

@@ -45,3 +45,9 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Drive full-experience visual treatment from blueprint visual_style, arc_type, music_mood, and pacing.
 - [x] Add a deterministic contract test proving materially different briefs map to different scene families and pacing classes.
 - [x] Ensure fallback/demo blueprints use the same dynamic renderer instead of reverting to rigid scenes.
+- [x] Investigate and document why the user-visible card still feels like one rigid template.
+- [x] Redesign the blueprint to author variable card layouts, content blocks, and asset directions.
+- [x] Implement materially different rendered card structures from different briefs.
+- [x] Add explicit AI-authored asset-direction text to every scene blueprint and map it to structured visual tokens.
+- [x] Wire asset directions into visible visual treatments through concrete background, texture, lighting, typography, and motif tokens.
+- [ ] Validate two complete experiences visually and functionally before claiming the issue is fixed.

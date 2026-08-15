@@ -25,6 +25,9 @@ describe("birthday blueprint contract", () => {
     expect(new Set(heartfelt.scenes.map((scene) => getSceneVisualFamily(scene, heartfelt.visual_style))).size).toBeGreaterThan(1);
     expect(getScenePacingClass(playful.scenes[0], playful.pacing.overall)).toContain("ai-pacing-slow_build");
     expect(getScenePacingClass(heartfelt.scenes[0], heartfelt.pacing.overall)).toContain("ai-overall-dynamic-to-emotional");
+    expect(new Set(playful.scenes.map((scene) => scene.render_mode)).size).toBeGreaterThan(3);
+    expect(playful.scenes.every((scene) => scene.asset_direction.length > 10)).toBe(true);
+    expect(playful.card_layout).not.toBe(heartfelt.card_layout);
   });
 
   it("changes the fallback scene contract for materially different briefs", () => {
