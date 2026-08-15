@@ -14,14 +14,24 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 
 ## Vercel Redeploy
 
-- [ ] Open the logged-in Vercel dashboard and identify the existing project or import flow.
-- [ ] Configure Vercel to use the updated GitHub main branch.
-- [ ] Confirm and execute the Vercel redeploy.
-- [ ] Verify the deployment and report the live URL.
+- [x] Open the logged-in Vercel dashboard and identify the existing project or import flow.
+- [x] Configure Vercel to use the updated GitHub main branch.
+- [x] Confirm and execute the Vercel redeploy.
+- [x] Verify the deployment and report the live URL.
 
 ## Vercel Build Fix
 
-- [ ] Add a Vercel-compatible frontend build configuration without disrupting Manus hosting.
-- [ ] Validate the corrected build locally and push the deployment fix to GitHub.
-- [ ] Redeploy from the updated main branch and verify the live Vercel response.
-- [ ] Report the deployment fix, live status, and any remaining backend limitation.
+- [x] Add a Vercel-compatible frontend build configuration without disrupting Manus hosting.
+- [x] Validate the corrected build locally and push the deployment fix to GitHub.
+- [x] Redeploy from the updated main branch and verify the live Vercel response.
+- [x] Report the deployment fix, live status, and any remaining backend limitation.
+
+## Browser Deployment-Fix Upload
+
+- [x] Prepare the five deployment-fix files for browser upload.
+- [x] Upload and commit the Vercel deployment fix on GitHub.
+- [x] Redeploy from main and verify the live Vercel response.
+- [x] Report the corrected deployment status and any limitations.
+- [x] Fix Vercel SPA fallback so public /birthday/:slug reader links resolve instead of returning 404.
+- [x] Run and record a local post-fix production build and Vitest validation.
+- [x] Document the final deployment status, public URL, and remaining mock-AI limitation.
