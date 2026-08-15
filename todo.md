@@ -51,3 +51,6 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [x] Add explicit AI-authored asset-direction text to every scene blueprint and map it to structured visual tokens.
 - [x] Wire asset directions into visible visual treatments through concrete background, texture, lighting, typography, and motif tokens.
 - [ ] Validate two complete experiences visually and functionally before claiming the issue is fixed.
+- [x] Fix the Vite HMR websocket mismatch between the proxied preview URL and the local dev server.
+- [x] Verify the browser console no longer reports the websocket failure after the middleware bridge fix.
+- [x] Verify client changes are accepted by the managed restart-on-change preview workflow; true proxied Vite hot-update is intentionally not used because the preview does not expose the internal websocket.

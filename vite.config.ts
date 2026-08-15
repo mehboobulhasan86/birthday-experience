@@ -170,6 +170,9 @@ export default defineConfig({
   },
   server: {
     host: true,
+    // The managed Manus preview restarts the dev server on file changes, but does not
+    // proxy Vite's internal websocket. Disable the client to avoid a false HMR error.
+    hmr: false,
     allowedHosts: [
       ".manuspre.computer",
       ".manus.computer",

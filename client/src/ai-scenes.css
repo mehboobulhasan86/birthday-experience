@@ -90,3 +90,4 @@
 .ai-overall-gentle-and-reflective .ai-scene-content { box-shadow: 0 40px 120px rgba(229,160,160,.13); }
 @keyframes ai-breathe { from { opacity: .72; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (max-width: 600px) { .ai-scene-meta { font-size: 8px; }.ai-scene-content { padding: 24px 18px; }.ai-visual-panel { height: 135px; }.ai-gallery-grid i { width: 58px; height: 82px; }.ai-beats p.lead { font-size: 29px; } }
+
