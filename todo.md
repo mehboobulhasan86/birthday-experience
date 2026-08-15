@@ -53,6 +53,8 @@ GitHub main branch: c8e8bd7e150dc4befeab395de47d44a8738c3836
 - [ ] Validate two complete experiences visually and functionally before claiming the issue is fixed.
 - [ ] Create and compare five live cards for contrasting profiles in the cloud browser.
 - [x] Preserve the generated blueprint scenes and AI layout metadata in the private preview after the server response.
+- [ ] Push the stale-blueprint repair and current AI card-composer changes to GitHub main and redeploy Vercel.
+- [ ] Re-run the five-profile live comparison against the updated production deployment.
 - [x] Fix the Vite HMR websocket mismatch between the proxied preview URL and the local dev server.
 - [x] Verify the browser console no longer reports the websocket failure after the middleware bridge fix.
 - [x] Verify client changes are accepted by the managed restart-on-change preview workflow; true proxied Vite hot-update is intentionally not used because the preview does not expose the internal websocket.
